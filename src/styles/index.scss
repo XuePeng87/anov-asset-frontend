@@ -1,0 +1,75 @@
+@use "./reset";
+
+.app-container {
+  padding: 10px;
+}
+
+.search-container {
+  padding: 18px 0 0 10px;
+  margin-bottom: 10px;
+  background-color: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  box-shadow: var(--el-box-shadow-light);
+}
+
+.table-container > .el-card__header {
+  padding: calc(var(--el-card-padding) - 8px) var(--el-card-padding);
+}
+
+.link-type,
+.link-type:focus {
+  color: #337ab7;
+  cursor: pointer;
+
+  &:hover {
+    color: rgb(32 160 255);
+  }
+}
+
+// 自定义抽屉样式
+.custom-drawer {
+  .el-drawer__header {
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .custom-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background-color: #f6f8f9;
+    border-bottom: 1px solid #dcdfe6;
+
+    h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2f3d;
+    }
+  }
+
+  .el-drawer__body {
+    padding: 20px;
+    padding-bottom: 70px; // 为底部按钮留出空间
+
+    .el-form {
+      padding: 20px;
+    }
+  }
+
+  .drawer-footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 16px 20px;
+    background: #fff;
+    border-top: 1px solid #dcdfe6;
+  }
+}
