@@ -11,6 +11,13 @@ class UserAPI {
     });
   }
 
+  static getUser() {
+    return request<any, UserResponse[]>({
+      url: "/v1/users/v1",
+      method: "get",
+    });
+  }
+
   // 根据编号查询系统用户
   static getUserByCode(code: string) {
     return request<any, UserResponse>({

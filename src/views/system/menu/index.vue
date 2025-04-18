@@ -195,7 +195,7 @@
 
         <!-- 组件页面完整路径 -->
         <el-form-item
-          v-if="formData.type === 1"
+          v-if="formData.type == 0 || formData.type === 1"
           label="页面路径"
           prop="component"
         >
@@ -257,7 +257,7 @@
 
         <!-- 权限标识 -->
         <el-form-item
-          v-if="formData.type == 1 || formData.type == 2"
+          v-if="formData.type == 0 || formData.type == 1 || formData.type == 2"
           label="权限标识"
           prop="perm"
         >

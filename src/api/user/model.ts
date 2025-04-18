@@ -9,6 +9,7 @@ export interface UserQueryRequest extends PageQuery {
 
 // 系统用户响应对象
 export interface UserResponse {
+  code: string;
   deptCode?: string;
   roleCodes?: string[];
   phoneNumber?: string;
