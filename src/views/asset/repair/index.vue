@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <div class="search-container">
+      <h3>设备：{{ assetName }}</h3>
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
         <el-form-item label="维修单号" prop="code">
           <el-input v-model="queryParams.code" placeholder="请输入维修单号" />
@@ -46,82 +47,19 @@
       </template>
 
       <el-table v-loading="loading" highlight-current-row :data="repairList">
-        <el-table-column type="expand">
-          <template #default="props">
-            <el-form label-position="left" inline class="repair-table-expand">
-              <el-form-item label="维修单号">
-                <span>{{ props.row.code }}</span>
-              </el-form-item>
-              <el-form-item label="资产编号">
-                <span>{{ props.row.assetCode }}</span>
-              </el-form-item>
-              <el-form-item label="资产名称">
-                <span>{{ props.row.assetName }}</span>
-              </el-form-item>
-              <el-form-item label="维修原因">
-                <span>{{ props.row.repairReason || "-" }}</span>
-              </el-form-item>
-              <el-form-item label="维修内容">
-                <span>{{ props.row.repairContent || "-" }}</span>
-              </el-form-item>
-              <el-form-item label="维修状态">
-                <el-tag v-if="props.row.status === 1" type="danger"
-                  >维修中</el-tag
-                >
-                <el-tag v-if="props.row.status === 2" type="success"
-                  >已完成</el-tag
-                >
-              </el-form-item>
-              <el-form-item label="维修费用">
-                <span>{{
-                  props.row.repairCost
-                    ? `￥${props.row.repairCost.toFixed(2)}`
-                    : "-"
-                }}</span>
-              </el-form-item>
-              <el-form-item label="维修人员">
-                <span>{{ props.row.repairer || "-" }}</span>
-              </el-form-item>
-              <el-form-item label="开始时间">
-                <span>{{ props.row.startTime }}</span>
-              </el-form-item>
-              <el-form-item label="结束时间">
-                <span>{{ props.row.endTime || "-" }}</span>
-              </el-form-item>
-              <el-form-item label="备注">
-                <span>{{ props.row.remark || "-" }}</span>
-              </el-form-item>
-              <el-form-item label="创建时间">
-                <span>{{ props.row.createTime }}</span>
-              </el-form-item>
-            </el-form>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="维修单号" prop="code" width="150" />
-        <el-table-column label="资产编号" prop="assetCode" width="150" />
-        <el-table-column label="资产名称" prop="assetName" width="150" />
-        <el-table-column
-          label="维修原因"
-          prop="repairReason"
-          show-overflow-tooltip
-        />
-        <el-table-column
-          label="维修费用"
-          prop="repairCost"
-          width="120"
-          align="center"
-        >
+        <el-table-column label="维修原因" prop="reason" />
+        <el-table-column label="维修费用" prop="cost" width="120" />
+        <el-table-column label="维修公司" prop="company" width="150" />
+        <el-table-column label="开始时间" prop="startDate" width="120" />
+        <el-table-column label="维修状态" prop="status" width="100">
           <template #default="scope">
-            {{
-              scope.row.repairCost
-                ? `￥${scope.row.repairCost.toFixed(2)}`
-                : "-"
-            }}
+            <el-tag v-if="scope.row.status === 0" type="danger">维修中</el-tag>
+            <el-tag v-if="scope.row.status === 1" type="success">已完成</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="开始时间" prop="startTime" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="结束时间" prop="endDate" width="120" />
+        <el-table-column label="维修结果" prop="result" />
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="scope">
             <el-button
               v-if="scope.row.status === 0"
@@ -132,15 +70,6 @@
               v-hasPerm="['ray:asset:repair:complete']"
             >
               <i-ep-check />完成维修
-            </el-button>
-            <el-button
-              type="primary"
-              link
-              size="small"
-              @click.stop="openDialog(scope.row.code)"
-              v-hasPerm="['ray:asset:repair:edit']"
-            >
-              <i-ep-view />查看
             </el-button>
           </template>
         </el-table-column>
@@ -182,25 +111,17 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="维修原因" prop="repairReason">
+        <el-form-item label="维修原因" prop="reason">
           <el-input
-            v-model="formData.repairReason"
+            v-model="formData.reason"
             type="textarea"
             :rows="3"
             placeholder="请输入维修原因"
           />
         </el-form-item>
-        <el-form-item label="维修内容" prop="repairContent">
-          <el-input
-            v-model="formData.repairContent"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入维修内容"
-          />
-        </el-form-item>
-        <el-form-item label="维修费用" prop="repairCost">
+        <el-form-item label="维修费用" prop="cost">
           <el-input-number
-            v-model="formData.repairCost"
+            v-model="formData.cost"
             :min="0"
             :precision="2"
             :step="100"
@@ -208,17 +129,8 @@
             placeholder="请输入维修费用"
           />
         </el-form-item>
-        <el-form-item label="维修人员" prop="repairer">
-          <el-input v-model="formData.repairer" placeholder="请输入维修人员" />
-        </el-form-item>
-        <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker
-            v-model="formData.startTime"
-            type="datetime"
-            placeholder="请选择开始时间"
-            style="width: 100%"
-            value-format="YYYY-MM-DD HH:mm:ss"
-          />
+        <el-form-item label="维修公司" prop="company">
+          <el-input v-model="formData.company" placeholder="请输入维修公司" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input
@@ -243,14 +155,75 @@
         </div>
       </template>
     </el-drawer>
+
+    <!-- 完成维修抽屉 -->
+    <el-drawer
+      v-model="completeDialog.visible"
+      :title="completeDialog.title"
+      :size="completeDialog.width"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
+      direction="rtl"
+      class="custom-drawer"
+      :before-close="handleCompleteClose"
+      :show-close="false"
+    >
+      <template #header="{ titleId, titleClass }">
+        <div class="custom-drawer-header">
+          <h4 :id="titleId" :class="titleClass">{{ completeDialog.title }}</h4>
+          <el-button type="primary" link @click="handleCompleteClose">
+            <i-ep-close />
+          </el-button>
+        </div>
+      </template>
+
+      <el-form
+        ref="completeFormRef"
+        :model="completeFormData"
+        :rules="completeRules"
+        label-width="100px"
+      >
+        <el-form-item label="维修结果" prop="result">
+          <el-input
+            v-model="completeFormData.result"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入维修结果"
+          />
+        </el-form-item>
+        <el-form-item label="结束时间" prop="endDate">
+          <el-date-picker
+            v-model="completeFormData.endDate"
+            type="date"
+            placeholder="请选择结束时间"
+            style="width: 100%"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="handleCompleteClose">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="submitCompleteForm"
+            :loading="completeSubmitLoading"
+          >
+            确 定
+          </el-button>
+        </div>
+      </template>
+    </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { AssetRepairAPI, AssetInfoAPI } from "@/api/asset";
+import { AssetRepairAPI } from "@/api/asset";
 import { AssetStatus, AssetRepairStatus } from "@/api/asset/model";
+import { useRoute } from "vue-router";
 import type {
   AssetRepairQueryRequest,
   AssetRepairResponse,
@@ -259,11 +232,13 @@ import type {
 
 // 状态选项
 const repairStatusOptions = {
-  [AssetRepairStatus.PENDING]: "待维修",
   [AssetRepairStatus.IN_PROGRESS]: "维修中",
   [AssetRepairStatus.COMPLETED]: "已完成",
-  [AssetRepairStatus.CANCELLED]: "已取消",
 };
+
+const route = useRoute();
+const assetCode = ref(route.query.assetCode as string);
+const assetName = ref(route.query.assetName as string);
 
 // 查询参数
 const queryParams = reactive<AssetRepairQueryRequest>({
@@ -276,26 +251,34 @@ const queryParams = reactive<AssetRepairQueryRequest>({
 
 // 表单数据
 const formData = reactive<AssetRepairFormRequest>({
-  assetCode: "",
-  repairReason: "",
-  repairContent: "",
-  repairCost: 0,
-  repairer: "",
-  startTime: "",
+  assetCode: assetCode.value,
+  reason: "",
+  cost: 0,
+  company: "",
   remark: "",
+});
+
+// 完成维修表单数据
+const completeFormData = reactive({
+  code: "",
+  assetCode: "",
+  result: "",
+  endDate: "",
 });
 
 // 表单校验规则
 const rules = {
   assetCode: [{ required: true, message: "请输入资产编号", trigger: "blur" }],
-  repairReason: [
-    { required: true, message: "请输入维修原因", trigger: "blur" },
-  ],
-  repairContent: [
-    { required: true, message: "请输入维修内容", trigger: "blur" },
-  ],
-  repairCost: [{ required: true, message: "请输入维修费用", trigger: "blur" }],
-  startTime: [{ required: true, message: "请选择开始时间", trigger: "blur" }],
+  reason: [{ required: true, message: "请输入维修原因", trigger: "blur" }],
+  cost: [{ required: true, message: "请输入维修费用", trigger: "blur" }],
+  company: [{ required: true, message: "请输入维修公司", trigger: "blur" }],
+  startDate: [{ required: true, message: "请选择开始时间", trigger: "blur" }],
+};
+
+// 完成维修表单校验规则
+const completeRules = {
+  result: [{ required: true, message: "请输入维修结果", trigger: "blur" }],
+  endDate: [{ required: true, message: "请选择结束时间", trigger: "blur" }],
 };
 
 // 弹窗配置
@@ -305,13 +288,22 @@ const dialog = reactive({
   width: "600px",
 });
 
+// 完成维修弹窗配置
+const completeDialog = reactive({
+  visible: false,
+  title: "完成维修",
+  width: "600px",
+});
+
 // 其他响应式数据
 const loading = ref(false);
 const submitLoading = ref(false);
+const completeSubmitLoading = ref(false);
 const total = ref(0);
 const repairList = ref<AssetRepairResponse[]>([]);
 const queryFormRef = ref();
 const dataFormRef = ref();
+const completeFormRef = ref();
 
 // 获取维修记录列表
 const getList = async () => {
@@ -348,21 +340,28 @@ const openDialog = async (code?: string) => {
     Object.assign(formData, res.data);
   } else {
     Object.assign(formData, {
-      assetCode: "",
-      repairReason: "",
-      repairContent: "",
-      repairCost: 0,
-      repairer: "",
-      startTime: "",
+      reason: "",
+      cost: 0,
+      company: "",
+      startDate: "",
       remark: "",
     });
   }
 };
 
 // 关闭弹窗
-const handleClose = () => {
-  dialog.visible = false;
-  dataFormRef.value?.resetFields();
+const handleClose = async () => {
+  try {
+    await ElMessageBox.confirm("确认关闭窗口？未保存的数据将会丢失", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+    dialog.visible = false;
+    dataFormRef.value?.resetFields();
+  } catch {
+    // 用户取消关闭，什么都不做
+  }
 };
 
 // 提交表单
@@ -374,12 +373,6 @@ const submitForm = async () => {
   try {
     submitLoading.value = true;
     await AssetRepairAPI.createAssetRepair(formData);
-
-    // 更新资产状态为维修中
-    await AssetInfoAPI.updateAssetStatus(formData.assetCode, {
-      status: AssetStatus.UNDER_REPAIR,
-    });
-
     ElMessage.success("创建成功");
     dialog.visible = false;
     getList();
@@ -391,89 +384,54 @@ const submitForm = async () => {
 };
 
 // 完成维修
-const handleComplete = async (row: AssetRepairResponse) => {
+const handleComplete = (row: AssetRepairResponse) => {
+  completeDialog.visible = true;
+  completeFormData.code = row.code;
+  completeFormData.assetCode = assetCode.value;
+
+  // 设置默认的结束时间为今天
+  const today = new Date();
+  completeFormData.endDate = today.toISOString().split("T")[0];
+};
+
+// 关闭完成维修弹窗
+const handleCompleteClose = async () => {
   try {
-    await ElMessageBox.confirm("确认完成该维修记录吗？", "提示", {
+    await ElMessageBox.confirm("确认关闭窗口？未保存的数据将会丢失", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
       type: "warning",
     });
-
-    await AssetRepairAPI.updateAssetRepairStatus(row.code, {
-      status: AssetRepairStatus.COMPLETED,
-      endTime: new Date().toISOString(),
-    });
-
-    // 更新资产状态为在库
-    await AssetInfoAPI.updateAssetStatus(row.assetCode, {
-      status: AssetStatus.IN_STOCK,
-    });
-
-    ElMessage.success("维修完成");
-    getList();
-  } catch (error) {
-    console.error("完成维修失败:", error);
+    completeDialog.visible = false;
+    completeFormRef.value?.resetFields();
+  } catch {
+    // 用户取消关闭，什么都不做
   }
 };
 
-// 获取状态类型
-const getStatusType = (status: AssetRepairStatus) => {
-  const typeMap = {
-    [AssetRepairStatus.PENDING]: "warning",
-    [AssetRepairStatus.IN_PROGRESS]: "primary",
-    [AssetRepairStatus.COMPLETED]: "success",
-    [AssetRepairStatus.CANCELLED]: "info",
-  };
-  return typeMap[status];
+// 提交完成维修表单
+const submitCompleteForm = async () => {
+  if (!completeFormRef.value) return;
+
+  await completeFormRef.value.validate();
+
+  try {
+    completeSubmitLoading.value = true;
+    await AssetRepairAPI.completeAssetRepair(
+      completeFormData.code,
+      completeFormData.result
+    );
+    ElMessage.success("维修完成");
+    completeDialog.visible = false;
+    getList();
+  } catch (error) {
+    console.error("完成维修失败:", error);
+  } finally {
+    completeSubmitLoading.value = false;
+  }
 };
 
 onMounted(() => {
   getList();
 });
 </script>
-
-<style lang="scss" scoped>
-.app-container {
-  padding: 20px;
-
-  .search-container {
-    margin-bottom: 20px;
-  }
-
-  .repair-table-expand {
-    padding: 20px;
-  }
-}
-
-.custom-drawer {
-  ::v-deep .el-drawer__header {
-    padding: 16px 20px;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--el-border-color-light);
-  }
-
-  ::v-deep .el-drawer__body {
-    padding: 20px;
-  }
-
-  .custom-drawer-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    h4 {
-      margin: 0;
-      font-size: 16px;
-    }
-  }
-
-  .dialog-footer {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 16px 20px;
-    text-align: right;
-    background: #fff;
-    border-top: 1px solid var(--el-border-color-light);
-  }
-}
-</style>

@@ -8,7 +8,6 @@ import {
   AssetInfoResponse,
   AssetInfoPageResponse,
   AssetInfoFormRequest,
-  AssetStatusUpdateRequest,
   AssetLoanQueryRequest,
   AssetLoanResponse,
   AssetLoanPageResponse,
@@ -17,7 +16,6 @@ import {
   AssetRepairPageResponse,
   AssetRepairFormRequest,
   AssetRepairResponse,
-  AssetRepairStatusUpdateRequest,
 } from "./model";
 
 class AssetCategoryAPI {
@@ -120,15 +118,6 @@ class AssetInfoAPI {
     });
   }
 
-  // 更新资产状态
-  static updateAssetStatus(code: string, data: AssetStatusUpdateRequest) {
-    return request({
-      url: `/v1/assets/v1/${code}/status`,
-      method: "put",
-      data: data,
-    });
-  }
-
   // 删除资产信息
   static deleteAssetInfo(codes: string[]) {
     return request({
@@ -204,32 +193,10 @@ class AssetRepairAPI {
   }
 
   // 修改资产维修记录
-  static updateAssetRepair(code: string, data: AssetRepairFormRequest) {
+  static completeAssetRepair(code: string, result: string) {
     return request({
-      url: "/v1/asset-repairs/v1/" + code,
+      url: "/v1/asset-repairs/v1/" + code + "/complete?result=" + result,
       method: "put",
-      data: data,
-    });
-  }
-
-  // 更新维修状态
-  static updateAssetRepairStatus(
-    code: string,
-    data: AssetRepairStatusUpdateRequest
-  ) {
-    return request({
-      url: `/v1/asset-repairs/v1/${code}/status`,
-      method: "put",
-      data: data,
-    });
-  }
-
-  // 删除资产维修记录
-  static deleteAssetRepair(codes: string[]) {
-    return request({
-      url: "/v1/asset-repairs/v1",
-      method: "delete",
-      data: codes,
     });
   }
 }
