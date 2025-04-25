@@ -182,6 +182,7 @@
             check-strictly
             :render-after-expand="false"
             :props="{ children: 'children', label: 'name', value: 'code' }"
+            :default-expand-all="true"
           />
         </el-form-item>
 

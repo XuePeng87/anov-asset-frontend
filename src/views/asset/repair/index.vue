@@ -6,12 +6,6 @@
         <el-form-item label="维修单号" prop="code">
           <el-input v-model="queryParams.code" placeholder="请输入维修单号" />
         </el-form-item>
-        <el-form-item label="资产编号" prop="assetCode">
-          <el-input
-            v-model="queryParams.assetCode"
-            placeholder="请输入资产编号"
-          />
-        </el-form-item>
         <el-form-item label="维修状态" prop="status">
           <el-select
             v-model="queryParams.status"
@@ -245,7 +239,7 @@ const queryParams = reactive<AssetRepairQueryRequest>({
   offset: 1,
   limit: 10,
   code: undefined,
-  assetCode: undefined,
+  assetCode: assetCode.value,
   status: undefined,
 });
 

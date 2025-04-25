@@ -3,13 +3,19 @@
     <div class="search-container">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
         <el-form-item label="资产名称" prop="name">
-          <el-input v-model="queryParams.name" placeholder="请输入资产名称" />
+          <el-input
+            v-model="queryParams.name"
+            placeholder="请输入资产名称"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="资产分类" prop="categoryCode">
           <el-select
             v-model="queryParams.categoryCode"
             placeholder="请选择资产分类"
             style="width: 200px"
+            clearable
+            filterable
           >
             <el-option
               v-for="item in categoryOptions"
@@ -19,11 +25,37 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="领用人" prop="userCode">
+          <el-select
+            v-model="queryParams.userCode"
+            placeholder="请选择领用人"
+            filterable
+            style="width: 200px"
+            clearable
+          >
+            <el-option
+              v-for="item in userOptions"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="采购年份" prop="purchaseYear">
+          <el-date-picker
+            v-model="queryParams.purchaseYear"
+            type="year"
+            placeholder="请选择采购年份"
+            value-format="YYYY"
+            style="width: 100px"
+          />
+        </el-form-item>
         <el-form-item label="资产状态" prop="status">
           <el-select
             v-model="queryParams.status"
             placeholder="请选择资产状态"
             style="width: 200px"
+            clearable
           >
             <el-option
               v-for="(label, value) in assetStatusOptions"
@@ -75,14 +107,12 @@
                   >在库</el-tag
                 >
                 <el-tag v-if="props.row.status === 1" type="success"
-                  >使用中</el-tag
+                  >使用</el-tag
                 >
                 <el-tag v-if="props.row.status === 2" type="danger"
-                  >维修中</el-tag
+                  >维修</el-tag
                 >
-                <el-tag v-if="props.row.status === 3" type="info"
-                  >已报废</el-tag
-                >
+                <el-tag v-if="props.row.status === 3" type="info">损坏</el-tag>
               </el-form-item>
               <el-form-item label="存放位置">
                 <span>{{ props.row.location || "-" }}</span>
@@ -104,17 +134,28 @@
             </el-form>
           </template>
         </el-table-column>
-        <el-table-column label="资产名称" prop="name" width="150" />
-        <el-table-column label="资产分类" prop="categoryName" width="120" />
+        <el-table-column label="资产名称" prop="name" width="180" />
+        <el-table-column
+          label="资产分类"
+          prop="categoryName"
+          width="120"
+          align="center"
+        />
+        <el-table-column
+          label="领用人"
+          prop="userName"
+          width="100"
+          align="center"
+        />
         <el-table-column label="品牌" prop="brand" width="120" />
-        <el-table-column label="型号" prop="model" width="120" />
+        <el-table-column label="型号" prop="model" width="150" />
         <el-table-column label="规格" prop="specification" />
         <el-table-column label="状态" align="center" width="100">
           <template #default="scope">
             <el-tag v-if="scope.row.status === 0" type="warning">在库</el-tag>
-            <el-tag v-if="scope.row.status === 1" type="success">使用中</el-tag>
-            <el-tag v-if="scope.row.status === 2" type="danger">维修中</el-tag>
-            <el-tag v-if="scope.row.status === 3" type="info">已报废</el-tag>
+            <el-tag v-if="scope.row.status === 1" type="success">使用</el-tag>
+            <el-tag v-if="scope.row.status === 2" type="danger">维修</el-tag>
+            <el-tag v-if="scope.row.status === 3" type="info">损坏</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -126,7 +167,7 @@
         <el-table-column
           label="设备金额"
           prop="price"
-          width="150"
+          width="12n0"
           align="center"
         >
           <template #default="scope">
@@ -161,7 +202,7 @@
               @click.stop="handleOpenRepair(scope.row)"
               ><el-icon><Van /></el-icon>维修</el-button
             >
-            <el-dropdown trigger="click">
+            <!-- <el-dropdown trigger="click">
               <el-button
                 type="warning"
                 link
@@ -187,7 +228,7 @@
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
-            </el-dropdown>
+            </el-dropdown> -->
           </template>
         </el-table-column>
       </el-table>
@@ -207,7 +248,7 @@
       :title="dialog.title"
       :size="dialog.width"
       :close-on-click-modal="false"
-      :close-on-press-escape="true"
+      :close-on-press-escape="false"
       direction="rtl"
       class="custom-drawer"
       :before-close="handleClose"
@@ -521,6 +562,7 @@ function resetForm() {
     code: undefined,
     name: undefined,
     categoryCode: undefined,
+    userCode: undefined,
     brand: undefined,
     model: undefined,
     specification: undefined,

@@ -36,6 +36,8 @@ export enum AssetStatus {
 export interface AssetInfoQueryRequest extends PageQuery {
   code?: string;
   name?: string;
+  userCode?: string;
+  purchaseYear?: string;
   categoryCode?: string;
   status?: AssetStatus;
 }
